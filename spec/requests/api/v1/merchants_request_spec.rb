@@ -48,4 +48,19 @@ describe "Merchants API" do
     expect(merchant[:data][:attributes]).to have_key(:name)
     expect(merchant[:data][:attributes][:name]).to be_a(String)
   end
+
+  it "can create a new merchant" do
+    merchant_params = ({
+                        name: Faker::Company.name
+                      })
+    headers = {"CONTENT_TYPE" => "application/json"}
+
+    # We include this header to make sure that these params are passed as JSON rather than as plain text
+    post "/api/v1/merchants", headers: headers, params: JSON.generate(merchant: merchant_params)
+
+    created_merchant = Merchant.last
+
+    expect(response).to be_successful
+    expect(created_merchant.name).to eq(merchant_params[:name])
+  end
 end
