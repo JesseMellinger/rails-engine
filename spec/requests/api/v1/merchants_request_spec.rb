@@ -55,12 +55,27 @@ describe "Merchants API" do
                       })
     headers = {"CONTENT_TYPE" => "application/json"}
 
-    # We include this header to make sure that these params are passed as JSON rather than as plain text
     post "/api/v1/merchants", headers: headers, params: JSON.generate(merchant: merchant_params)
 
     created_merchant = Merchant.last
 
     expect(response).to be_successful
     expect(created_merchant.name).to eq(merchant_params[:name])
+  end
+
+  it "can update an existing merchant" do
+    id = create(:merchant).id
+    previous_name = Merchant.last.name
+
+    merchant_params = { name: Faker::Company.name }
+    headers = {"CONTENT_TYPE" => "application/json"}
+
+    patch "/api/v1/merchants/#{id}", headers: headers, params: JSON.generate({merchant: merchant_params})
+
+    merchant = Merchant.find_by(id: id)
+
+    expect(response).to be_successful
+    expect(merchant.name).to_not eq(previous_name)
+    expect(merchant.name).to eq(merchant_params[:name])
   end
 end
