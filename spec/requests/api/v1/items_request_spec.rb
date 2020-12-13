@@ -103,4 +103,48 @@ describe "Items API" do
     expect(item.name).to_not eq(previous_name)
     expect(item.name).to eq(item_params[:name])
   end
+
+  it "can destroy an item" do
+    item = create(:item)
+
+    expect{ delete "/api/v1/items/#{item.id}" }.to change(Item, :count).by(-1)
+
+    expect(response).to be_successful
+    expect{Item.find(item.id)}.to raise_error(ActiveRecord::RecordNotFound)
+  end
+
+  it "can destroy an item's invoice items and invoices if invoice has no items attached" do
+    customer = create(:customer)
+    merchant = create(:merchant)
+    item = create(:item, merchant: merchant)
+
+    customer.invoices.create!(merchant_id: merchant.id)
+    customer.invoices.create!(merchant_id: merchant.id)
+    customer.invoices.create!(merchant_id: merchant.id)
+    customer.invoices.create!(merchant_id: merchant.id)
+    customer.invoices.create!(merchant_id: merchant.id)
+
+    item.invoice_items.create!(invoice_id: Invoice.first.id)
+    item.invoice_items.create!(invoice_id: Invoice.second.id)
+    item.invoice_items.create!(invoice_id: Invoice.third.id)
+    item.invoice_items.create!(invoice_id: Invoice.fourth.id)
+    item.invoice_items.create!(invoice_id: Invoice.fifth.id)
+
+    expect(InvoiceItem.count).to eq(5)
+    expect(Invoice.count).to eq(5)
+
+    expect{ delete "/api/v1/items/#{item.id}" }.to change(Item, :count).by(-1)
+
+    expect(response).to be_successful
+    expect(InvoiceItem.count).to eq(0)
+    expect(Invoice.count).to eq(0)
+
+    item.invoice_items.all? do |invoice_item|
+      expect{InvoiceItem.find(invoice_item.id)}.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    item.invoices.all? do |invoice|
+      expect{Invoice.find(invoice.id)}.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
 end
