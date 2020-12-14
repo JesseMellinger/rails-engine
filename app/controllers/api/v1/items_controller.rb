@@ -20,9 +20,22 @@ class Api::V1::ItemsController < ApplicationController
     render body: nil, status: 204
   end
 
+  def find
+    key = item_params.keys.first
+    value = item_params.values.first.to_s
+    item = Item.find_by_attribute(key, value)
+    render json: ItemSerializer.new(item)
+  end
+
+  def find_all
+    key = item_params.keys.first
+    value = item_params.values.first.to_s
+    items = Item.find_all_by_attribute(key, value)
+    render json: ItemSerializer.new(items)
+  end
+
   private
   def item_params
-    return params.require(:item).permit(:name, :description, :unit_price, :merchant_id) if params[:item]
-    params.permit(:name, :description, :unit_price, :merchant_id)
+    params.permit(:name, :description, :unit_price, :merchant_id, :created_at, :updated_at)
   end
 end

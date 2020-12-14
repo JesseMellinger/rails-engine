@@ -78,7 +78,7 @@ describe "Items API" do
                   })
     headers = {"CONTENT_TYPE" => "application/json"}
 
-    post "/api/v1/items", headers: headers, params: JSON.generate(item: item_params)
+    post "/api/v1/items", headers: headers, params: JSON.generate(item_params)
 
     created_item = Item.last
 
@@ -96,7 +96,7 @@ describe "Items API" do
     item_params = { name: Faker::Commerce.product_name }
     headers = {"CONTENT_TYPE" => "application/json"}
 
-    patch "/api/v1/items/#{id}", headers: headers, params: JSON.generate({item: item_params})
+    patch "/api/v1/items/#{id}", headers: headers, params: JSON.generate(item_params)
     item = Item.find_by(id: id)
 
     expect(response).to be_successful
@@ -164,6 +164,282 @@ describe "Items API" do
       expect(item).to have_key(:id)
       expect(item[:id]).to be_an(String)
 
+      expect(item).to have_key(:type)
+      expect(item[:type]).to eq("item")
+
+      expect(item).to have_key(:attributes)
+      expect(item[:attributes]).to be_a(Hash)
+
+      expect(item[:attributes]).to have_key(:name)
+      expect(item[:attributes][:name]).to be_a(String)
+
+      expect(item[:attributes]).to have_key(:description)
+      expect(item[:attributes][:description]).to be_a(String)
+
+      expect(item[:attributes]).to have_key(:unit_price)
+      expect(item[:attributes][:unit_price]).to be_a(Float)
+
+      expect(item[:attributes]).to have_key(:merchant_id)
+      expect(item[:attributes][:merchant_id]).to eq(merchant.id)
+    end
+  end
+
+  it 'finds a single record that matches a set of criteria with partial strings and case insensitivity' do
+    merchant = create(:merchant)
+    items = create_list(:item, 2, merchant: merchant)
+
+    get "/api/v1/items/find?name=#{items.first.name}"
+
+    item = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(item[:data]).to be_a(Hash)
+
+    expect(item[:data]).to have_key(:id)
+    expect(item[:data][:id]).to eq(items.first.id.to_s)
+
+    expect(item[:data]).to have_key(:type)
+    expect(item[:data][:type]).to eq("item")
+
+    expect(item[:data]).to have_key(:attributes)
+    expect(item[:data][:attributes]).to be_a(Hash)
+
+    expect(item[:data][:attributes]).to have_key(:name)
+    expect(item[:data][:attributes][:name]).to eq(items.first.name)
+
+    expect(item[:data][:attributes]).to have_key(:description)
+    expect(item[:data][:attributes][:description]).to eq(items.first.description)
+
+    expect(item[:data][:attributes]).to have_key(:unit_price)
+    expect(item[:data][:attributes][:unit_price]).to eq(items.first.unit_price)
+
+    expect(item[:data][:attributes]).to have_key(:merchant_id)
+    expect(item[:data][:attributes][:merchant_id]).to eq(items.first.merchant_id)
+
+    description = "Can one desire too much of a good thing?."
+    items.first.update!(description: description)
+    items.second.update!(description: "Can one admire too much of a good thing?")
+
+    get "/api/v1/items/find?description=Ire"
+
+    item = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(item[:data]).to be_a(Hash)
+
+    expect(item[:data]).to have_key(:id)
+    expect(item[:data][:id]).to eq(items.first.id.to_s)
+
+    expect(item[:data]).to have_key(:type)
+    expect(item[:data][:type]).to eq("item")
+
+    expect(item[:data]).to have_key(:attributes)
+    expect(item[:data][:attributes]).to be_a(Hash)
+
+    expect(item[:data][:attributes]).to have_key(:name)
+    expect(item[:data][:attributes][:name]).to eq(items.first.name)
+
+    expect(item[:data][:attributes]).to have_key(:description)
+    expect(item[:data][:attributes][:description]).to eq(items.first.description)
+
+    expect(item[:data][:attributes]).to have_key(:unit_price)
+    expect(item[:data][:attributes][:unit_price]).to eq(items.first.unit_price)
+
+    expect(item[:data][:attributes]).to have_key(:merchant_id)
+    expect(item[:data][:attributes][:merchant_id]).to eq(items.first.merchant_id)
+  end
+
+  it 'finds a single record by timestamps' do
+    items = create_list(:item, 3)
+
+    get "/api/v1/items/find?created_at=#{items.second.created_at}"
+
+    item = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(item[:data]).to be_a(Hash)
+
+    expect(item[:data]).to have_key(:id)
+    expect(item[:data][:id]).to eq(items.first.id.to_s)
+
+    expect(item[:data]).to have_key(:type)
+    expect(item[:data][:type]).to eq("item")
+
+    expect(item[:data]).to have_key(:attributes)
+    expect(item[:data][:attributes]).to be_a(Hash)
+
+    expect(item[:data][:attributes]).to have_key(:name)
+    expect(item[:data][:attributes][:name]).to eq(items.first.name)
+
+    expect(item[:data][:attributes]).to have_key(:description)
+    expect(item[:data][:attributes][:description]).to eq(items.first.description)
+
+    expect(item[:data][:attributes]).to have_key(:unit_price)
+    expect(item[:data][:attributes][:unit_price]).to eq(items.first.unit_price)
+
+    expect(item[:data][:attributes]).to have_key(:merchant_id)
+    expect(item[:data][:attributes][:merchant_id]).to eq(items.first.merchant_id)
+
+    items.first.update!(updated_at: 10.days.from_now)
+
+    get "/api/v1/items/find?updated_at=#{items.second.updated_at}"
+
+    item = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(item[:data]).to be_a(Hash)
+
+    expect(item[:data]).to have_key(:id)
+    expect(item[:data][:id]).to eq(items.second.id.to_s)
+
+    expect(item[:data]).to have_key(:type)
+    expect(item[:data][:type]).to eq("item")
+
+    expect(item[:data]).to have_key(:attributes)
+    expect(item[:data][:attributes]).to be_a(Hash)
+
+    expect(item[:data][:attributes]).to have_key(:name)
+    expect(item[:data][:attributes][:name]).to eq(items.second.name)
+
+    expect(item[:data][:attributes]).to have_key(:description)
+    expect(item[:data][:attributes][:description]).to eq(items.second.description)
+
+    expect(item[:data][:attributes]).to have_key(:unit_price)
+    expect(item[:data][:attributes][:unit_price]).to eq(items.second.unit_price)
+
+    expect(item[:data][:attributes]).to have_key(:merchant_id)
+    expect(item[:data][:attributes][:merchant_id]).to eq(items.second.merchant_id)
+  end
+
+  it 'finds all records that match a set of criteria with partial strings and case insensitivity' do
+    merchant = create(:merchant)
+    items = create_list(:item, 3, merchant: merchant)
+
+    items.first.update!(name: "Practical Granite Shirt", description: "Can one desire too much of a good thing?.")
+    items.second.update!(name: "Infinite Star Socks", description: "In my mind's eye.")
+    items.third.update!(name: "Awesome Concrete Watch", description: "Can one admire too much of a good thing?")
+
+    get "/api/v1/items/find_all?name=ITE"
+
+    item_response = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(item_response[:data]).to be_an(Array)
+    expect(item_response[:data].count).to eq(2)
+
+    expect(item_response[:data].first[:id]).to eq(items.first.id.to_s)
+    expect(item_response[:data].last[:id]).to eq(items.second.id.to_s)
+
+    item_response[:data].each do |item|
+      expect(item).to have_key(:type)
+      expect(item[:type]).to eq("item")
+
+      expect(item).to have_key(:attributes)
+      expect(item[:attributes]).to be_a(Hash)
+
+      expect(item[:attributes]).to have_key(:name)
+      expect(item[:attributes][:name]).to be_a(String)
+
+      expect(item[:attributes]).to have_key(:description)
+      expect(item[:attributes][:description]).to be_a(String)
+
+      expect(item[:attributes]).to have_key(:unit_price)
+      expect(item[:attributes][:unit_price]).to be_a(Float)
+
+      expect(item[:attributes]).to have_key(:merchant_id)
+      expect(item[:attributes][:merchant_id]).to eq(merchant.id)
+    end
+
+    get "/api/v1/items/find_all?description=IrE"
+
+    item_response = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(item_response[:data]).to be_an(Array)
+    expect(item_response[:data].count).to eq(2)
+
+    expect(item_response[:data].first[:id]).to eq(items.first.id.to_s)
+    expect(item_response[:data].last[:id]).to eq(items.third.id.to_s)
+
+    item_response[:data].each do |item|
+      expect(item).to have_key(:type)
+      expect(item[:type]).to eq("item")
+
+      expect(item).to have_key(:attributes)
+      expect(item[:attributes]).to be_a(Hash)
+
+      expect(item[:attributes]).to have_key(:name)
+      expect(item[:attributes][:name]).to be_a(String)
+
+      expect(item[:attributes]).to have_key(:description)
+      expect(item[:attributes][:description]).to be_a(String)
+
+      expect(item[:attributes]).to have_key(:unit_price)
+      expect(item[:attributes][:unit_price]).to be_a(Float)
+
+      expect(item[:attributes]).to have_key(:merchant_id)
+      expect(item[:attributes][:merchant_id]).to eq(merchant.id)
+    end
+  end
+
+  it 'finds all records by timestamps' do
+    merchant = create(:merchant)
+    items = create_list(:item, 3, merchant: merchant)
+
+    get "/api/v1/items/find_all?created_at=#{items.second.created_at}"
+
+    item_response = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(item_response[:data]).to be_an(Array)
+    expect(item_response[:data].count).to eq(3)
+
+    expect(item_response[:data].first[:id]).to eq(items.first.id.to_s)
+    expect(item_response[:data].second[:id]).to eq(items.second.id.to_s)
+    expect(item_response[:data].third[:id]).to eq(items.third.id.to_s)
+
+    item_response[:data].each do |item|
+      expect(item).to have_key(:type)
+      expect(item[:type]).to eq("item")
+
+      expect(item).to have_key(:attributes)
+      expect(item[:attributes]).to be_a(Hash)
+
+      expect(item[:attributes]).to have_key(:name)
+      expect(item[:attributes][:name]).to be_a(String)
+
+      expect(item[:attributes]).to have_key(:description)
+      expect(item[:attributes][:description]).to be_a(String)
+
+      expect(item[:attributes]).to have_key(:unit_price)
+      expect(item[:attributes][:unit_price]).to be_a(Float)
+
+      expect(item[:attributes]).to have_key(:merchant_id)
+      expect(item[:attributes][:merchant_id]).to eq(merchant.id)
+    end
+
+    items.first.update!(updated_at: 10.days.from_now)
+
+    get "/api/v1/items/find_all?updated_at=#{items.second.updated_at}"
+
+    item_response = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(item_response[:data]).to be_a(Array)
+    expect(item_response[:data].count).to eq(2)
+
+    expect(item_response[:data].first[:id]).to eq(items.second.id.to_s)
+    expect(item_response[:data].last[:id]).to eq(items.third.id.to_s)
+
+    item_response[:data].each do |item|
       expect(item).to have_key(:type)
       expect(item[:type]).to eq("item")
 
