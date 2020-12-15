@@ -21,16 +21,16 @@ class Api::V1::ItemsController < ApplicationController
   end
 
   def find
-    key = item_params.keys.first
+    attribute = item_params.keys.first
     value = item_params.values.first.to_s
-    item = Item.find_by_attribute(key, value)
+    item = Item.find_by_attribute(attribute, value)
     render json: ItemSerializer.new(item)
   end
 
   def find_all
-    key = item_params.keys.first
+    attribute = item_params.keys.first
     value = item_params.values.first.to_s
-    items = Item.find_all_by_attribute(key, value)
+    items = Item.find_all_by_attribute(attribute, value)
     render json: ItemSerializer.new(items)
   end
 
