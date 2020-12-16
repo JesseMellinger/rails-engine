@@ -160,8 +160,22 @@ describe 'business intelligence' do
 
     expect(revenue[:data]).to be_a(Hash)
 
-    expect(revenue[:data][:id]).to eq('null')
+    expect(revenue[:data][:id]).to be_nil
     expect(revenue[:data][:attributes]).to be_a(Hash)
     expect(revenue[:data][:attributes][:revenue]).to eq(total_revenue)
+  end
+
+  it 'returns the total revenue for a single merchant' do
+    get "/api/v1/merchants/#{@m1.id}/revenue"
+
+    revenue = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(revenue[:data]).to be_a(Hash)
+
+    expect(revenue[:data][:id]).to be_nil
+    expect(revenue[:data][:attributes]).to be_a(Hash)
+    expect(revenue[:data][:attributes][:revenue]).to eq(@m1_tr)
   end
 end
