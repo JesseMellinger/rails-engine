@@ -142,10 +142,6 @@ describe "Items API" do
     item.invoice_items.all? do |invoice_item|
       expect{InvoiceItem.find(invoice_item.id)}.to raise_error(ActiveRecord::RecordNotFound)
     end
-
-    item.invoices.all? do |invoice|
-      expect{Invoice.find(invoice.id)}.to raise_error(ActiveRecord::RecordNotFound)
-    end
   end
 
   it 'returns all items associated with a merchant' do
@@ -332,8 +328,8 @@ describe "Items API" do
     expect(item_response[:data]).to be_an(Array)
     expect(item_response[:data].count).to eq(2)
 
-    expect(item_response[:data].first[:id]).to eq(items.first.id.to_s)
-    expect(item_response[:data].last[:id]).to eq(items.second.id.to_s)
+    expect(item_response[:data]).to include(a_hash_including(:id => items.first.id.to_s))
+    expect(item_response[:data]).to include(a_hash_including(:id => items.second.id.to_s))
 
     item_response[:data].each do |item|
       expect(item).to have_key(:type)
@@ -364,8 +360,8 @@ describe "Items API" do
     expect(item_response[:data]).to be_an(Array)
     expect(item_response[:data].count).to eq(2)
 
-    expect(item_response[:data].first[:id]).to eq(items.first.id.to_s)
-    expect(item_response[:data].last[:id]).to eq(items.third.id.to_s)
+    expect(item_response[:data]).to include(a_hash_including(:id => items.first.id.to_s))
+    expect(item_response[:data]).to include(a_hash_including(:id => items.third.id.to_s))
 
     item_response[:data].each do |item|
       expect(item).to have_key(:type)
@@ -458,5 +454,22 @@ describe "Items API" do
       expect(item[:attributes]).to have_key(:merchant_id)
       expect(item[:attributes][:merchant_id]).to eq(merchant.id)
     end
+  end
+
+  it 'renders a bad request if attribute passed does not exist on items table' do
+    merchant = create(:merchant)
+    items = create_list(:item, 2, merchant: merchant)
+
+    get "/api/v1/items/find?material=#{Faker::Commerce.material}"
+
+    item = JSON.parse(response.body, symbolize_names: true)
+
+    expect(item).to be_a(Hash)
+
+    expect(item).to have_key(:error)
+    expect(item[:error]).to eq("No such attribute for items")
+
+    expect(item).to have_key(:status)
+    expect(item[:status]).to eq(400)
   end
 end
