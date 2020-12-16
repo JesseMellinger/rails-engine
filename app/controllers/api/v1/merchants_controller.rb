@@ -45,13 +45,13 @@ class Api::V1::MerchantsController < ApplicationController
   end
 
   def revenue_between_dates
-    revenue = FindRevenue.find_revenue_by_dates(params[:start], params[:end])
-    render json: RevenueSerializer.serialize(revenue.first)
+    revenue = FindRevenueFacade.find_revenue_by_dates(params[:start], params[:end])
+    render json: RevenueSerializer.new(revenue.first)
   end
 
   def revenue
-    revenue = FindRevenue.find_revenue_of_merchant(params[:id])
-    render json: RevenueSerializer.serialize(revenue.first)
+    revenue = FindRevenueFacade.find_revenue_of_merchant(params[:id])
+    render json: RevenueSerializer.new(revenue.first)
   end
 
   private
