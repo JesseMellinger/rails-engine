@@ -1,12 +1,10 @@
 class RevenueSerializer
-  include FastJsonapi::ObjectSerializer
-  attributes :name
-  def self.serialize(revenue)
+  def self.serialize(result)
   {
     "data": {
-      "id": 'null',
+      "id": nil,
       "attributes": {
-        "revenue": revenue
+        "revenue": result
       }
     }
   }
