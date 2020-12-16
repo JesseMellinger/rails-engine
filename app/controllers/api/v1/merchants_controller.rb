@@ -44,8 +44,13 @@ class Api::V1::MerchantsController < ApplicationController
     render json: MerchantSerializer.new(merchants)
   end
 
+  def revenue_between_dates
+    revenue = FindRevenue.find_revenue_by_dates(params[:start], params[:end])
+    render json: RevenueSerializer.serialize(revenue.first)
+  end
+
   def revenue
-    revenue = FindRevenue.new(params[:start], params[:end]).find_revenue_by_dates()
+    revenue = FindRevenue.find_revenue_of_merchant(params[:id])
     render json: RevenueSerializer.serialize(revenue.first)
   end
 
