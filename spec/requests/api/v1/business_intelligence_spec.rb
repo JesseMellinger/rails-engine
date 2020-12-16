@@ -182,7 +182,7 @@ describe 'business intelligence' do
     get '/api/v1/merchants/most_items?quantity=7'
 
     merchants = JSON.parse(response.body, symbolize_names: true)
-    # require "pry"; binding.pry
+    
     expect(response).to be_successful
 
     expect(merchants[:data]).to be_an(Array)
