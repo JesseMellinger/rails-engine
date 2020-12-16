@@ -123,19 +123,18 @@ describe 'business intelligence' do
   end
 
   it 'returns a variable number of merchants ranked by total number of items sold' do
-    get '/api/v1/merchants/most_items?quantity=4'
+    get '/api/v1/merchants/most_items?quantity=3'
 
     merchants = JSON.parse(response.body, symbolize_names: true)
 
     expect(response).to be_successful
 
     expect(merchants[:data]).to be_an(Array)
-    expect(merchants[:data].count).to eq(4)
+    expect(merchants[:data].count).to eq(3)
 
     expect(merchants[:data].first[:id]).to eq(@m1.id.to_s)
     expect(merchants[:data].second[:id]).to eq(@m4.id.to_s)
     expect(merchants[:data].third[:id]).to eq(@m6.id.to_s)
-    expect(merchants[:data].fourth[:id]).to eq(@m2.id.to_s)
 
     merchants[:data].each do |merchant|
       expect(merchant).to have_key(:type)
@@ -177,5 +176,46 @@ describe 'business intelligence' do
     expect(revenue[:data][:id]).to be_nil
     expect(revenue[:data][:attributes]).to be_a(Hash)
     expect(revenue[:data][:attributes][:revenue]).to eq(@m1_tr)
+  end
+
+  it 'returns maximum number of merchants that meet conditions ranked by total number of items sold if variable number given exceeds total of unique records' do
+    get '/api/v1/merchants/most_items?quantity=7'
+
+    merchants = JSON.parse(response.body, symbolize_names: true)
+    # require "pry"; binding.pry
+    expect(response).to be_successful
+
+    expect(merchants[:data]).to be_an(Array)
+    expect(merchants[:data].count).to eq(4)
+
+    expect(merchants[:data].first[:id]).to eq(@m1.id.to_s)
+    expect(merchants[:data].second[:id]).to eq(@m4.id.to_s)
+    expect(merchants[:data].third[:id]).to eq(@m6.id.to_s)
+    expect(merchants[:data].fourth[:id]).to eq(@m2.id.to_s)
+
+    merchants[:data].each do |merchant|
+      expect(merchant).to have_key(:type)
+      expect(merchant[:type]).to eq("merchant")
+
+      expect(merchant).to have_key(:attributes)
+      expect(merchant[:attributes]).to be_a(Hash)
+
+      expect(merchant[:attributes]).to have_key(:name)
+      expect(merchant[:attributes][:name]).to be_a(String)
+    end
+  end
+
+  it 'returns nil value for revenue key if merchant id does not exist' do
+    get "/api/v1/merchants/#{Faker::Number.number(digits: 10)}/revenue"
+
+    revenue = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+
+    expect(revenue[:data]).to be_a(Hash)
+
+    expect(revenue[:data][:id]).to be_nil
+    expect(revenue[:data][:attributes]).to be_a(Hash)
+    expect(revenue[:data][:attributes][:revenue]).to be_nil
   end
 end
