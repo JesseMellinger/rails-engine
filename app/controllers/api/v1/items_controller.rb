@@ -23,8 +23,16 @@ class Api::V1::ItemsController < ApplicationController
   def find
     attribute = item_params.keys.first
     value = item_params.values.first.to_s
-    item = Item.find_by_attribute(attribute, value)
-    render json: ItemSerializer.new(item)
+    if ActiveRecord::Base.connection.column_exists?(:items, attribute)
+      item = Item.find_by_attribute(attribute, value)
+      render json: ItemSerializer.new(item)
+    else
+      payload = {
+        error: "No such attribute for items",
+        status: 400
+      }
+      render :json => payload, :status => :bad_request
+    end
   end
 
   def find_all

@@ -40,7 +40,7 @@ class Api::V1::MerchantsController < ApplicationController
   end
 
   def most_items
-    merchants = Merchant.most_items(params[:quantity])
+    merchants = Merchant.most_items(params[:quantity].to_i)
     render json: MerchantSerializer.new(merchants)
   end
 
