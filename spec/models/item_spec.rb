@@ -31,8 +31,8 @@ RSpec.describe Item, type: :model do
       @items.second.update!(name: "Infinite Star Socks", description: "In my mind's eye.")
       @items.third.update!(name: "Awesome Concrete Watch", description: "Can one admire too much of a good thing?")
 
-      expect(Item.find_all_by_attribute("name", "ITE")).to eq([@items.first, @items.second])
-      expect(Item.find_all_by_attribute("description", "IrE")).to eq([@items.first, @items.third])
+      expect(Item.find_all_by_attribute("name", "ITE")).to include(@items.first, @items.second)
+      expect(Item.find_all_by_attribute("description", "IrE")).to include(@items.first, @items.third)
 
       expect(Item.find_all_by_attribute("created_at", @items.first.created_at)).to eq(@items)
 
