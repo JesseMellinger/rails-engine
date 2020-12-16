@@ -10,6 +10,10 @@ Rails.application.routes.draw do
       end
       get 'merchants/find', to: 'merchants#find'
       get 'merchants/find_all', to: 'merchants#find_all'
+      get 'merchants/most_revenue', to: 'merchants#most_revenue'
+      get 'merchants/most_items', to: 'merchants#most_items'
+      get 'merchants/:id/revenue', to: 'merchants#revenue'
+      get 'revenue', to: 'merchants#revenue_between_dates'
       resources :merchants, except: [:new, :edit] do
         resources :items, only: [:index], module: :merchants
       end
