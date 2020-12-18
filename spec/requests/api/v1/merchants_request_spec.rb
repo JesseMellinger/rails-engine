@@ -142,7 +142,7 @@ describe "Merchants API" do
     get "/api/v1/merchants/find?name=Ing"
 
     merchant = JSON.parse(response.body, symbolize_names: true)
-    
+
     expect(response).to be_successful
 
     expect(merchant[:data]).to be_a(Hash)
@@ -222,8 +222,8 @@ describe "Merchants API" do
     expect(merchant_response[:data]).to be_an(Array)
     expect(merchant_response[:data].count).to eq(2)
 
-    expect(merchant_response[:data].first[:id]).to eq(merchants.first.id.to_s)
-    expect(merchant_response[:data].last[:id]).to eq(merchants.third.id.to_s)
+    expect(merchant_response[:data]).to include(a_hash_including(:id => merchants.first.id.to_s))
+    expect(merchant_response[:data]).to include(a_hash_including(:id => merchants.third.id.to_s))
 
     merchant_response[:data].each do |merchant|
       expect(merchant).to have_key(:type)
