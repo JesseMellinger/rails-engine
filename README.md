@@ -2,7 +2,7 @@
 
 ## About the Project
 
-Rails Engine is an E-Commerce Application using a service-oriented architecture. The front and back ends of this application are separate and communicate via APIs. The main objective of this project is to expose the data that powers the site through various API endpoints that the front end will consume.
+Rails Engine is an E-Commerce Application using a service-oriented architecture. The frontend and backend of this application are separate and communicate via APIs. The main objective of this project is to expose the data that powers the site through various API endpoints that the front end will consume.
 
 ### Learning Goals
 
@@ -20,7 +20,7 @@ Rails 5.2.4.3
 
 ## Getting Started
 
-1. Create a new directory called `rails-engine` (in this directory will live both frontend and backend repos of this project)
+1. Create a new directory called `rails-engine` (in this directory will live both the frontend and backend repos of this project)
 2. cd into this directory `cd rails-engine`
 3. Fork this repo
 4. Run `bundle install`
