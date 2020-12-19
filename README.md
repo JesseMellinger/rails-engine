@@ -15,6 +15,7 @@ Rails Engine is an E-Commerce Application using a service-oriented architecture.
 ### Built With
 
 Ruby 2.5.3
+
 Rails 5.2.4.3
 
 ## Getting Started
@@ -27,7 +28,9 @@ Rails 5.2.4.3
 6. If interested in running the frontend portion of this project in conjunction with the backend then clone this [repo](https://github.com/JesseMellinger/rails_driver) in the `rails-engine` directory
 7. Follow the setup instructions in the README file found in the repository
 8. In order to view the project in the browser spin up two servers on different ports with the following commands (both commands are preceded by the directories in which they should run):
+
 `rails-engine -> rails s`
+
 `rails_driver -> rails s -p 3001`
 
 ## Database Schema
