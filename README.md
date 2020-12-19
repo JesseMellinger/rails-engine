@@ -35,6 +35,11 @@ Rails 5.2.4.3
 
 ## Database Schema
 
+![Rails Engine Schema](https://user-images.githubusercontent.com/29828129/102696656-14fb4c00-41ed-11eb-9d62-3c2dfc08c154.png)
+
+## Contact
+
+Jesse Mellinger - [LinkedIn](https://www.linkedin.com/in/jesse-mellinger/)
 
 
 
